@@ -51,24 +51,50 @@ describe('App e2e', () => {
     prisma = app.get(PrismaService);
 
     await prisma.cleanDb();
+    pactum.request.setBaseUrl('http://localhost:3333');
   });
 
   afterAll(async () => { 
     await app.close();
   });
-  it.todo('should pass');
+  const dto: AuthDto = {
+    email: "redphantom2010@gmail.com",
+    password: "123456",
+  }
   describe('Auth', () => {
     describe("Signup", () => {
+      it('Should fail if email empty',() => {
+        return pactum.spec().post('/auth/signup', ).withBody({password: dto.password}).expectStatus(400).inspect();
+      });
+
+      it('Should fail if password empty',() => {
+        return pactum.spec().post('/auth/signup', ).withBody({email: dto.email}).expectStatus(400).inspect();
+      });
+
+      it('Should fail if no body',() => {
+        return pactum.spec().post('/auth/signup', ).expectStatus(400).inspect();
+      });
+
       it('Should create a new user',() => {
-        const dto: AuthDto = {
-          email: "redphantom2010@gmail.com",
-          password: "123456",
-        }
-        return pactum.spec().post('http://localhost:3333/auth/signup', ).withBody(dto).expectStatus(201);
+        return pactum.spec().post('/auth/signup', ).withBody(dto).expectStatus(201).inspect();
       });
     });
     describe("Signin", () => {
-      it.todo('Should sign in a user');
+      it('Should fail if email empty',() => {
+        return pactum.spec().post('/auth/signin', ).withBody({password: dto.password}).expectStatus(400).inspect();
+      });
+
+      it('Should fail if password empty',() => {
+        return pactum.spec().post('/auth/signin', ).withBody({email: dto.email}).expectStatus(400).inspect();
+      });
+
+      it('Should fail if no body',() => {
+        return pactum.spec().post('/auth/signin', ).expectStatus(400).inspect();
+      });
+
+      it('Should signin a user',() => {
+        return pactum.spec().post('/auth/signin', ).withBody(dto).expectStatus(200).inspect();
+      });
     });
   });
 
